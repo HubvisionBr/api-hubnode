@@ -91,16 +91,16 @@ const fileController = {
 
     const pdfStream = base64ToReadableStream(req.body.base64Pdf);
     const authToken = req.headers['authorization'];
-    console.log(authToken)
+    //console.log(authToken)
     if (!authToken) {
       return res.status(400).json({ msg: 'Token de autenticação é obrigatório.' });
     }
 
     const formData = new FormData();
-    console.log(req.body.number);
-    console.log(req.body.base64Pdf);
+    //console.log(req.body.number);
+    //console.log(req.body.base64Pdf);
     formData.append('number', `${req.body.number}`); // Número de destino
-    formData.append('medias', pdfStream, { filename: 'BOLETO.pdf', contentType: 'application/pdf' }); // Arquivo de mídia
+    formData.append('medias', pdfStream, { filename: `${req.body.fileName}.pdf`, contentType: 'application/pdf' }); // Arquivo de mídia
     formData.append('openTicket', 0); // Utilize 1 para abrir um ticket
     formData.append('queueId', 0); // ID da fila desejada
     formData.append('body', ''); // Corpo da mensagem (texto)
@@ -143,6 +143,44 @@ const fileController = {
     }
 
 
+
+  },
+  sendExcelFile: async (req, res) => {
+
+    const authToken = req.headers['authorization'];
+    const formData = new FormData();
+    //const filePath = services.makeExcelFile(req.body.data, req.body.config.sheetName);
+    const fileBuffer = await services.makeExcelFile(req.body.data, req.body.config.sheetName);
+
+    formData.append('number', `${req.body.number}`); // Número de destino
+
+    formData.append('medias', fileBuffer, {
+      filename: `${req.body.config.fileName}.xlsx`,
+      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    formData.append('openTicket', 0); // Utilize 1 para abrir um ticket
+    formData.append('queueId', 0); // ID da fila desejada
+    formData.append('body', ''); // Corpo da mensagem (texto)
+    // console.log('Headers:', {
+    //   Authorization: `${authToken}`,
+    //   ...formData.getHeaders(),
+    // });
+    // console.log('Payload:', {
+    //   number: req.body.number,
+    //   fileName: req.body.config.fileName,
+    // });
+    try {
+      const response = await axios.post('https://api.hubot.app.br/api/messages/send', formData, {
+        headers: {
+          'Authorization': `${authToken}`, // Substitua pelo seu token
+          ...formData.getHeaders() // Isso é necessário para incluir o cabeçalho multipart/form-data corretamente
+        },
+      });
+      res.status(200).json({ msg: "Arquivo enviado com sucesso!" });
+
+    } catch (error) {
+      res.status(400).json({ error, msg: "Erro ao enviar arquivo." });
+    }
   }
 
 

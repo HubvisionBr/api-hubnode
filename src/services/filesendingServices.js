@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const XLSX = require('xlsx');
+
 // Função para converter Base64 para PDF
 function base64ToPDF(base64Data, outputPath) {
   // Remove a parte do tipo de conteúdo, caso esteja presente (como 'data:application/pdf;base64,')
@@ -74,5 +76,26 @@ function readFile(filePath) {
   }
   );
 }
-module.exports = { base64ToPDF, pdfToBase64,readFile};
+
+function makeExcelFile(data,sheetName) {
+  return new Promise((resolve, reject) => {
+
+    try {
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(workbook, worksheet,sheetName);
+
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+
+
+      //const file = new Blob([excelBuffer], { type: "application/octet-stream" });
+      resolve(excelBuffer);
+    }catch(err){
+      reject(`Erro ao construir arquivo: ${err}`);
+    }
+  
+  });
+}
+module.exports = { base64ToPDF, pdfToBase64,readFile,makeExcelFile};
 
