@@ -4,14 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "start": "netlify-lambda serve src",
+    "dev": "nodemon src/app.js",
+    "dev_net":"netlify dev src/app.js",
+    "build": "netlify-lambda build src"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.7",
+    "cmd": "^0.1.0",
     "config": "^3.3.11",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -22,11 +25,15 @@
     "fs": "^0.0.1-security",
     "hub_filesender": "file:",
     "msc_backend": "file:",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "netlify-cli": "^17.38.1",
+    "serve": "^14.2.4",
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",
     "globals": "^15.8.0",
+    "netlify-lambda": "^2.0.16",
     "nodemon": "^3.1.4"
   }
 }
